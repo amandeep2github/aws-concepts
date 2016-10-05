@@ -8,7 +8,7 @@
 
   "Parameters":{
 
-	"KeyName": {
+   "KeyName": {
       "Description" : "Name of an existing EC2 KeyPair to enable SSH access to the instance",
       "Type": "AWS::EC2::KeyPair::KeyName",
       "Default":"pluralsight-ec2-window",
@@ -92,6 +92,21 @@
   "Resources":{
     "EC2Instance":{
       "Type":"AWS::EC2::Instance",
+      "Metadata": {
+        "Comment1" : "install git",
+        "AWS::CloudFormation::Init" : {
+          "configSets" : {
+            "Install":["Install"]
+          },
+          "Install":{
+            "packages":{
+              "yum":{
+                "git":[]
+              }
+            }
+          }
+        }
+      },
       "Properties":{
         "InstanceType":{ "Ref":"InstanceType" },
         "SecurityGroups":
@@ -99,7 +114,24 @@
         ,
         "KeyName":{ "Ref":"KeyName" },
         "ImageId":{ "Fn::FindInMap":[ "AWSRegionArch2AMI", { "Ref" : "AWS::Region" },
-          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] }] }
+          { "Fn::FindInMap" : [ "AWSInstanceType2Arch", { "Ref" : "InstanceType" }, "Arch" ] }] },
+        "Tags":[
+          {"Key":"Name", "Value":"my-first-ec2-cfn"}
+        ],
+        "UserData" : { "Fn::Base64" : { "Fn::Join" : ["", [
+             "#!/bin/bash -xe\n",
+             "yum update -y aws-cfn-bootstrap\n",
+
+             "# Install the files and packages from the metadata\n",
+             "/opt/aws/bin/cfn-init -v ",
+             "         --stack ", { "Ref" : "AWS::StackName" },
+             "         --resource EC2Instance ",
+             "         --configsets Install ",
+             "         --region ", { "Ref" : "AWS::Region" }, "\n"
+		           ]
+               ]
+               }
+             }
       }
 
     },
