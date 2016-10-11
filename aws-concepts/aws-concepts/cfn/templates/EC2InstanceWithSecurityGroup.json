@@ -93,7 +93,7 @@
     "EC2Instance":{
       "Type":"AWS::EC2::Instance",
       "Metadata": {
-        "Comment1" : "install git",
+        "Comment1" : "install apache",
         "AWS::CloudFormation::Init" : {
           "configSets" : {
             "Install":["Install"]
@@ -101,12 +101,37 @@
           "Install":{
             "packages":{
               "yum":{
-                "git":[]
+                "httpd":[]
+              }
+            },
+            "files":{
+              "/var/www/html/index.html":{
+                "content":{ "Fn::Join":[ "", [
+                  "<html>\n",
+                  "  <head>\n",
+                  "    <title>AWS CloudFormation PHP Sample</title>\n",
+                  "    <meta http-equiv=\"Content-Type\" content=\"text/html; charset=ISO-8859-1\">\n",
+                  "  </head>\n",
+                  "  <body>\n",
+                  "    <h1>Welcome to the AWS CloudFormation Apache Sample</h1>\n",
+                  "  </body>\n",
+                  "</html>\n"
+                ]]},
+                "mode":"000600",
+                "owner":"apache",
+                "group":"apache"
+                }
+              },
+              "services":{
+                "sysvinit": {
+                  "httpd": { "enabled" : "true", "ensureRunning" : "true" }
+                }
               }
             }
           }
-        }
-      },
+
+        },
+
       "Properties":{
         "InstanceType":{ "Ref":"InstanceType" },
         "SecurityGroups":
@@ -138,13 +163,11 @@
     "InstanceSecurityGroup" : {
       "Type" : "AWS::EC2::SecurityGroup",
       "Properties" : {
-        "GroupDescription" : "Enable SSH access via port 22",
-        "SecurityGroupIngress" : [ {
-          "IpProtocol" : "tcp",
-          "FromPort" : "22",
-          "ToPort" : "22",
-          "CidrIp" : { "Ref" : "SSHLocation"}
-        } ]
+        "GroupDescription" : "Enable SSH access via port 22 and 80",
+        "SecurityGroupIngress" : [
+          { "IpProtocol" : "tcp", "FromPort" : "22", "ToPort" : "22", "CidrIp" : { "Ref" : "SSHLocation"} },
+          { "IpProtocol" : "tcp", "FromPort" : "80", "ToPort" : "80", "CidrIp" : "0.0.0.0/0" }
+        ]
       }
     }
   },
@@ -167,6 +190,4 @@
       "Value" : { "Fn::GetAtt" : [ "EC2Instance", "PublicIp" ] }
     }
   }
-
-
 }
