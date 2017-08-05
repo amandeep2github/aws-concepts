@@ -1,0 +1,91 @@
+---
+AWSTemplateFormatVersion: '2010-09-09'
+Description: All things needed to get aws solution architect associate certification
+#Metadata: #Required: no
+
+#Mappings: #Required: no
+
+Parameters: #Required: no
+ TulipKeyPairName:
+  Type: AWS::EC2::KeyPair::KeyName
+  Description: Key for all tulip resources access
+  Default: TulipKeyPair
+  #AllowedValues: 
+  # - TulipKeyPair
+  ConstraintDescription: Can't be other than tulip prefixed
+ 
+ TulipEC2InstanceType:
+  Type: String
+  Description: Type of instance e.g. micro, small etc
+  Default: t2.micro
+  AllowedValues: 
+  - t2.micro
+  ConstraintDescription: Can't be other than free instance type i.e. t2.micro 
+ 
+ TulipSSHLocation:
+  Type: String
+  Description: The IP address range that can be used to SSH to the EC2 instances
+  Default: 122.161.46.84/0
+  AllowedValues:
+  - 122.161.46.84/0
+  AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"#double quotes required otherwise validation fails
+  ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+     
+
+#Conditions: #Required: no
+ 
+Resources: 
+ TulipVioletBTowers: #can only be alphnumeric
+   Type: "AWS::EC2::VPC" #double quotes optional
+   Properties:
+     CidrBlock: 192.168.0.0/16
+     #EnableDnsSupport: true
+     #EnableDnsHostnames: true
+     #InstanceTenancy: default
+     Tags:
+      - Key: Name
+        Value: Tulip Violet B Towers
+        #three implcity tags which aws makes when resources created as part of stack
+        #aws:cloudformation:logical-id
+        #aws:cloudformation:stack-id
+        #aws:cloudformation:stack-name
+        
+ B08Subnet:
+  Type: AWS::EC2::Subnet
+  Properties:
+   #AvailabilityZone: <some value like us-west-2a>
+   CidrBlock: 192.168.1.0/24
+   #MapPublicIpOnLaunch: false
+   VpcId: 
+    Ref: TulipVioletBTowers  
+   Tags:
+    - Key: Name
+      Value: B08
+      
+ B08SecurityGroup:
+  Type: "AWS::EC2::SecurityGroup"
+  Properties:
+   #GroupName: #Required: no, Default value: <logic name of stack>-<logic name of Security Group>-<some id>
+   GroupDescription: Security Group created for B08 Tower
+   VpcId:
+    Ref: TulipVioletBTowers
+   SecurityGroupIngress:
+   - IpProtocol: tcp
+     FromPort: 80
+     ToPort: 80
+     CidrIp: 0.0.0.0/0
+   - IpProtocol: tcp
+     FromPort: 22
+     ToPort: 22
+     CidrIp: 
+      Ref: TulipSSHLocation   
+   SecurityGroupEgress: #by default its all types, all protocol, all ports, 0.0.0.0/0 
+   - IpProtocol: tcp
+     FromPort: 80
+     ToPort: 80
+     CidrIp: 0.0.0.0/0
+   Tags:
+    - Key: Name
+      Value: B08 Security Group
+ B081101EC2:           
+#Outputs: #Required: no

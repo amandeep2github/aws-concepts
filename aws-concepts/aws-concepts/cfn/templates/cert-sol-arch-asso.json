@@ -1,0 +1,11 @@
+{
+	"AWSTemplateFormatVersion":"2010-09-09",
+	"Description":"All things needed for passing aws solution architect associate certification",
+	"Metadata":{},
+	"Mappings":{},
+	"Parameters":{},
+	"Conditions":{},
+	"Resources":{},
+	"Outputs":{}
+	
+}
