@@ -6,86 +6,168 @@ Description: All things needed to get aws solution architect associate certifica
 #Mappings: #Required: no
 
 Parameters: #Required: no
- TulipKeyPairName:
-  Type: AWS::EC2::KeyPair::KeyName
-  Description: Key for all tulip resources access
-  Default: TulipKeyPair
-  #AllowedValues: 
-  # - TulipKeyPair
-  ConstraintDescription: Can't be other than tulip prefixed
+  TulipKeyPairName:
+    Type: AWS::EC2::KeyPair::KeyName
+    Description: Key for all tulip resources access
+    Default: TulipKeyPair
+    #AllowedValues: 
+    # - TulipKeyPair
+    ConstraintDescription: Can't be other than tulip prefixed
  
- TulipEC2InstanceType:
-  Type: String
-  Description: Type of instance e.g. micro, small etc
-  Default: t2.micro
-  AllowedValues: 
-  - t2.micro
-  ConstraintDescription: Can't be other than free instance type i.e. t2.micro 
+  TulipEC2InstanceType:
+    Type: String
+    Description: Type of instance e.g. micro, small etc
+    Default: t2.micro
+    AllowedValues: 
+    - t2.micro
+    ConstraintDescription: Can't be other than free instance type i.e. t2.micro 
  
- TulipSSHLocation:
-  Type: String
-  Description: The IP address range that can be used to SSH to the EC2 instances
-  Default: 122.161.46.84/0
-  AllowedValues:
-  - 122.161.46.84/0
-  AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"#double quotes required otherwise validation fails
-  ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
+  TulipSSHLocation:
+    Type: String
+    Description: The IP address range that can be used to SSH to the EC2 instances
+    Default: 122.161.46.84/0
+    AllowedValues:
+    - 122.161.46.84/0
+    AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"#double quotes required otherwise validation fails
+    ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
      
 
 #Conditions: #Required: no
  
 Resources: 
- TulipVioletBTowers: #can only be alphnumeric
-   Type: "AWS::EC2::VPC" #double quotes optional
-   Properties:
-     CidrBlock: 192.168.0.0/16
-     #EnableDnsSupport: true
-     #EnableDnsHostnames: true
-     #InstanceTenancy: default
-     Tags:
+  TulipVioletBTowers: #can only be alphnumeric
+    Type: "AWS::EC2::VPC" #double quotes optional
+    Properties:
+      Tags:
       - Key: Name
         Value: Tulip Violet B Towers
         #three implcity tags which aws makes when resources created as part of stack
         #aws:cloudformation:logical-id
         #aws:cloudformation:stack-id
         #aws:cloudformation:stack-name
-        
- B08Subnet:
-  Type: AWS::EC2::Subnet
-  Properties:
-   #AvailabilityZone: <some value like us-west-2a>
-   CidrBlock: 192.168.1.0/24
-   #MapPublicIpOnLaunch: false
-   VpcId: 
-    Ref: TulipVioletBTowers  
-   Tags:
-    - Key: Name
-      Value: B08
+      CidrBlock: 192.168.0.0/16
+      #EnableDnsSupport: true
+      #EnableDnsHostnames: true
+      #InstanceTenancy: default
       
- B08SecurityGroup:
-  Type: "AWS::EC2::SecurityGroup"
-  Properties:
-   #GroupName: #Required: no, Default value: <logic name of stack>-<logic name of Security Group>-<some id>
-   GroupDescription: Security Group created for B08 Tower
-   VpcId:
-    Ref: TulipVioletBTowers
-   SecurityGroupIngress:
-   - IpProtocol: tcp
-     FromPort: 80
-     ToPort: 80
-     CidrIp: 0.0.0.0/0
-   - IpProtocol: tcp
-     FromPort: 22
-     ToPort: 22
-     CidrIp: 
-      Ref: TulipSSHLocation   
-   SecurityGroupEgress: #by default its all types, all protocol, all ports, 0.0.0.0/0 
-   - IpProtocol: tcp
-     FromPort: 80
-     ToPort: 80
-     CidrIp: 0.0.0.0/0
-   Tags:
-    - Key: Name
-      Value: B08 Security Group
- B081101EC2:           
+        
+  B08Subnet:
+    Type: AWS::EC2::Subnet
+    Properties:
+      Tags:
+      - Key: Name
+        Value: B08
+      #AvailabilityZone: <some value like us-west-2a>
+      CidrBlock: 192.168.1.0/24
+      #MapPublicIpOnLaunch: false
+      VpcId: 
+        Ref: TulipVioletBTowers  
+      
+      
+  B08SecurityGroup:
+    Type: "AWS::EC2::SecurityGroup"
+    Properties:
+      #GroupName: #Required: no, Default value: <logic name of stack>-<logic name of Security Group>-<some id>
+      GroupDescription: Security Group created for B08 Tower
+      VpcId:
+        Ref: TulipVioletBTowers
+      SecurityGroupIngress:
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      - IpProtocol: tcp
+        FromPort: 22
+        ToPort: 22
+        CidrIp: 
+          Ref: TulipSSHLocation   
+      SecurityGroupEgress: #by default its all types, all protocol, all ports, 0.0.0.0/0 
+      - IpProtocol: tcp
+        FromPort: 80
+        ToPort: 80
+        CidrIp: 0.0.0.0/0
+      Tags:
+      - Key: Name
+        Value: B08 Security Group
+  BucketVersioningOn: #only alpha numeric ie. no hyphen
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+      - Key: Name
+        Value: Personal Bucket
+      AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]] 
+        Fn::Select: [0, [AuthenticatedRead, BucketOwnerRead]] 
+      BucketName: bucket-versioning-on
+      #CorsConfiguration: CORS Configuration
+      LifecycleConfiguration: 
+        Rules:
+        - #ExpirationDate: String
+          ExpirationInDays: 121
+          Id: adsingh12345
+          #NoncurrentVersionExpirationInDays: Integer
+          #NoncurrentVersionTransition (deprecated):
+          #NoncurrentVersionTransition type
+          #NoncurrentVersionTransitions:
+          #  StorageClass: STANDARD_IA
+          #  #TransitionDate: String
+          #  TransitionInDays: 30
+          #Prefix: String
+          Status: Enabled
+          #Transition (deprecated):
+          #  Transition type
+          Transitions:
+          - StorageClass: STANDARD_IA
+            #TransitionDate: String
+            TransitionInDays: 30
+          - StorageClass: GLACIER #StorageClass: REDUCED_REDUNDANCY can only be given only when put object
+            #TransitionDate: String
+            TransitionInDays: 60
+      #LoggingConfiguration: Logging Configuration
+      #NotificationConfiguration: Notification Configuration
+      ReplicationConfiguration: #To enable replication, you must also enable versioning
+        Role:
+        Rules:
+        - Destination: 
+            Bucket: !Ref 'BucketReplicatedData'
+            #StorageClass: String #not required
+          Id: s3-bucket-rep-rule
+          Prefix: ""
+          Status: Enabled
+        
+      VersioningConfiguration: 
+        Status: 
+          Fn::Select: [0, [Enabled, Suspended]]
+      #WebsiteConfiguration: Website Configuration Type
+      
+  S3ReplicationRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          -
+            Effect: Allow
+            Principal:
+              Service: s3.amazonaws.com
+            Action: sts:AssumeRole  
+        
+  BucketReplicatedData: #only alpha numeric ie. no hyphen
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+      - Key: Name
+        Value: Replicated data Bucket
+      AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]] 
+        Fn::Select: [0, [AuthenticatedRead, BucketOwnerRead]] 
+      BucketName: bucket-replicated-data
+      #CorsConfiguration: CORS Configuration
+      #LifecycleConfiguration: 
+      #LoggingConfiguration: Logging Configuration
+      #NotificationConfiguration: Notification Configuration
+      #ReplicationConfiguration: #To enable replication, you must also enable versioning
+      VersioningConfiguration: 
+        Status: 
+          Fn::Select: [0, [Enabled, Suspended]]
+      #WebsiteConfiguration: Website Configuration Type             
+# B081101EC2:           
 #Outputs: #Required: no
