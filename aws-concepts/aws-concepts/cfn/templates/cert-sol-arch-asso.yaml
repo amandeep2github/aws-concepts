@@ -31,6 +31,15 @@ Parameters: #Required: no
     AllowedPattern: "(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})\\.(\\d{1,3})/(\\d{1,2})"#double quotes required otherwise validation fails
     ConstraintDescription: must be a valid IP CIDR range of the form x.x.x.x/x.
      
+  ReplicationBucket:
+    Type: String
+    Description: Bucket where objects will be backed up
+    Default: bucket-replicated-data
+    
+  ReplicationRegion:
+    Type: String
+    Description: region of the bucket where objects are backed
+    Default: us-east-2  
 
 #Conditions: #Required: no
  
@@ -89,15 +98,15 @@ Resources:
       Tags:
       - Key: Name
         Value: B08 Security Group
-  BucketVersioningOn: #only alpha numeric ie. no hyphen
+  L0Bucket: #only alpha numeric ie. no hyphen
     Type: AWS::S3::Bucket
     Properties:
       Tags:
       - Key: Name
         Value: Personal Bucket
       AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]] 
-        Fn::Select: [0, [AuthenticatedRead, BucketOwnerRead]] 
-      BucketName: bucket-versioning-on
+        Fn::Select: [2, [AuthenticatedRead, BucketOwnerRead, BucketOwnerFullControl]] #http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+      BucketName: l0-bucket-12345
       #CorsConfiguration: CORS Configuration
       LifecycleConfiguration: 
         Rules:
@@ -115,6 +124,8 @@ Resources:
           Status: Enabled
           #Transition (deprecated):
           #  Transition type
+          AbortIncompleteMultipartUpload:
+            DaysAfterInitiation: 7  
           Transitions:
           - StorageClass: STANDARD_IA
             #TransitionDate: String
@@ -122,13 +133,17 @@ Resources:
           - StorageClass: GLACIER #StorageClass: REDUCED_REDUNDANCY can only be given only when put object
             #TransitionDate: String
             TransitionInDays: 60
-      #LoggingConfiguration: Logging Configuration
+        
+            
+      #LoggingConfiguration:
+        #DestinationBucketName: default is current bucket
+      #  LogFilePrefix: logs/access/ 
       #NotificationConfiguration: Notification Configuration
       ReplicationConfiguration: #To enable replication, you must also enable versioning
-        Role:
+        Role: !GetAtt [S3ReplicationRole, Arn]
         Rules:
         - Destination: 
-            Bucket: !Ref 'BucketReplicatedData'
+            Bucket: !Join ['', ['arn:aws:s3:::', !Ref ReplicationBucket]]
             #StorageClass: String #not required
           Id: s3-bucket-rep-rule
           Prefix: ""
@@ -137,37 +152,72 @@ Resources:
       VersioningConfiguration: 
         Status: 
           Fn::Select: [0, [Enabled, Suspended]]
-      #WebsiteConfiguration: Website Configuration Type
-      
+      WebsiteConfiguration: #http://bucket-versioning-on.s3-website-us-west-2.amazonaws.com
+        ErrorDocument: error.html
+        IndexDocument: index.html
+        #RedirectAllRequestsTo:
+        #RoutingRules:
+        #- Routing rule 
+        
   S3ReplicationRole:
     Type: AWS::IAM::Role
     Properties:
       AssumeRolePolicyDocument:
         Version: 2012-10-17
         Statement:
-          -
-            Effect: Allow
-            Principal:
-              Service: s3.amazonaws.com
-            Action: sts:AssumeRole  
-        
-  BucketReplicatedData: #only alpha numeric ie. no hyphen
-    Type: AWS::S3::Bucket
+        - Action: ['sts:AssumeRole']  
+          Effect: Allow
+          Principal:
+            Service: [s3.amazonaws.com]
+  
+  S3ReplicationPolicy:
+    Type: AWS::IAM::Policy
     Properties:
-      Tags:
-      - Key: Name
-        Value: Replicated data Bucket
-      AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]] 
-        Fn::Select: [0, [AuthenticatedRead, BucketOwnerRead]] 
-      BucketName: bucket-replicated-data
-      #CorsConfiguration: CORS Configuration
-      #LifecycleConfiguration: 
-      #LoggingConfiguration: Logging Configuration
-      #NotificationConfiguration: Notification Configuration
-      #ReplicationConfiguration: #To enable replication, you must also enable versioning
-      VersioningConfiguration: 
-        Status: 
-          Fn::Select: [0, [Enabled, Suspended]]
-      #WebsiteConfiguration: Website Configuration Type             
+      PolicyName: S3ReplicationPolicy
+      Roles: [!Ref S3ReplicationRole]
+      PolicyDocument:
+        Statement:
+        - Action: ['s3:GetReplicationConfiguration', 's3:ListBucket']
+          Effect: Allow
+          Resource:
+          - !Join ['', ['arn:aws:s3:::', !Ref L0Bucket]] 
+        - Action: ['s3:GetObjectVersion', 's3:getObjectVersionAcl']
+          Effect: Allow
+          Resource:
+          - !Join ['', ['arn:aws:s3:::', !Ref L0Bucket, /*]]
+        - Action: ['s3:ReplicateObject', 's3:ReplicateDelete']
+          Effect: Allow
+          Resource:
+          - !Join ['', ['arn:aws:s3:::', !Ref ReplicationBucket, /* ]]
+  S3PutObjectPolicy:
+    Type: AWS::IAM::Policy
+    Metadata:
+      Comment: "Implements the policy described at http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html"
+      Comment: "http://docs.aws.amazon.com/AmazonS3/latest/dev/UsingServerSideEncryption.html"
+    Properties:
+      PolicyName: S3PutObjectPolicy
+      Roles: [!Ref S3ReplicationRole]
+      PolicyDocument:
+        Statement:
+        - Sid: DenyUnEncryptedObjectUploads
+          Effect: Deny
+          #Principal: "*"
+          Action: 's3:PutObject'
+          Resource:
+          - !Join ['', ['arn:aws:s3:::', !Ref L0Bucket, /*]] 
+          Condition:
+            StringNotEquals: 
+              "s3:x-amz-server-side-encryption": AES256
+  
+  AdministratorsGroup:
+    Type: AWS::IAM::Group
+    Properties:
+      GroupName: 
+        !Join ['', [!Ref 'AWS::Region', 'Administrators']]
+      ManagedPolicyArns: ['arn:aws:iam::aws:policy/IAMFullAccess']
+      #Path:
+      #Policies:  
+          
+             
 # B081101EC2:           
 #Outputs: #Required: no
