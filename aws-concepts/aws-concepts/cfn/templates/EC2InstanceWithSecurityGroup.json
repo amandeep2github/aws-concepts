@@ -17,8 +17,8 @@
     "InstanceType":{
       "Description":"Type of instance e.g. micro, small etc",
       "Type":"String",
-      "Default":"t2.micro",
-      "AllowedValues":["t1.micro", "t2.micro"]
+      "Default":"t2.nano",
+      "AllowedValues":["t2.nano", "t2.micro"]
     },
     "SSHLocation" : {
       "Description" : "The IP address range that can be used to SSH to the EC2 instances",

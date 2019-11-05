@@ -1,0 +1,8 @@
+Description: Creates a S3 bucket
+Resources:
+  S3Bucket:
+    Type: AWS::S3::Bucket
+Outputs:
+  S3BucketName:
+    Value:
+      Ref: S3Bucket
