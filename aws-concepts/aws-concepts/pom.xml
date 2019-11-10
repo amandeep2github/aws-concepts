@@ -5,7 +5,10 @@
   <groupId>learn.aws</groupId>
   <artifactId>aws-concepts</artifactId>
   <version>0.0.1-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <modules>
+    <module>lambda</module>
+  </modules>
+  <packaging>pom</packaging>
 
   <name>aws-concepts</name>
   <url>http://maven.apache.org</url>
