@@ -1,0 +1,18 @@
+BucketReplicatedData: #only alpha numeric ie. no hyphen
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+      - Key: Name
+        Value: Replicated data Bucket
+      AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]] 
+        Fn::Select: [0, [AuthenticatedRead, BucketOwnerRead]] 
+      BucketName: bucket-replicated-data
+      #CorsConfiguration: CORS Configuration
+      #LifecycleConfiguration: 
+      #LoggingConfiguration: Logging Configuration
+      #NotificationConfiguration: Notification Configuration
+      #ReplicationConfiguration: #To enable replication, you must also enable versioning
+      VersioningConfiguration: 
+        Status: 
+          Fn::Select: [0, [Enabled, Suspended]]
+      #WebsiteConfiguration: Website Configuration Type  

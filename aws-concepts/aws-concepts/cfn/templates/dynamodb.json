@@ -1,0 +1,31 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Metadata": {
+    "AWS::CloudFormation::Designer": {
+      "0008848d-e961-498d-b965-67e336e17f82": {
+        "size": {
+          "width": 60,
+          "height": 60
+        },
+        "position": {
+          "x": 287,
+          "y": 93
+        },
+        "z": 0
+      }
+    }
+  },
+  "Resources": {
+    "DDBT2TD34": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "TableName": "sabkush"
+      },
+      "Metadata": {
+        "AWS::CloudFormation::Designer": {
+          "id": "0008848d-e961-498d-b965-67e336e17f82"
+        }
+      }
+    }
+  }
+}
