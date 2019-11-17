@@ -1,8 +1,6 @@
-package learn.aws.aws_concepts.connect;
+package learn.aws.s3;
 
 import com.amazonaws.auth.profile.ProfileCredentialsProvider;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClient;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.model.Bucket;
@@ -29,11 +27,5 @@ public class ProfileSpecificClientConnection {
         System.out.println(s3.doesBucketExist("amandeep.singh22publicissapient.com"));
         return new ArrayList<>();
     }
-
-    public AmazonDynamoDB getDynamoDbConnection(String profile){
-        AmazonDynamoDB amazonDynamoDB = AmazonDynamoDBClient.builder().withCredentials(new ProfileCredentialsProvider(profile)).withRegion("us-east-1").build();
-        return amazonDynamoDB;
-    }
-
 
 }

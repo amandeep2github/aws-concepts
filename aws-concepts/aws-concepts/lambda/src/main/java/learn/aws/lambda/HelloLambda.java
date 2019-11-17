@@ -8,20 +8,23 @@ import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import com.amazonaws.services.s3.model.GetObjectRequest;
 import com.amazonaws.services.s3.model.S3Object;
 import com.amazonaws.services.s3.model.S3ObjectInputStream;
+import com.amazonaws.services.lambda.runtime.Context;
+import learn.aws.lambda.model.InvokeLambdaParameters;
+
 
 import java.io.*;
 
 public class HelloLambda {
 	public static void main(String[] args) throws IOException {
-		hello();
+//		hello();
 	}
-	public static String hello() throws IOException {
+	public static String hello(InvokeLambdaParameters params, Context context) throws IOException {
 //		AWSCredentialsProvider acp = new ProfileCredentialsProvider("pubsap");
 //		System.out.println(acp.getCredentials());
 		//getS3ObjectMetadata();
 		//runLocalProcess();
-		copyS3ObjectMetadata();
-		return "HelloLambda Ji!";
+//		copyS3ObjectMetadata();
+		return String.format("HelloLambda Ji! - %s", params.getName());
 	}
 
 	private static void runLocalProcess() throws IOException {
