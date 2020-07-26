@@ -1,0 +1,60 @@
+L3Bucket: #only alpha numeric ie. no hyphen
+    Type: AWS::S3::Bucket
+    Properties:
+      Tags:
+      - Key: Name
+        Value: Personal Bucket
+      AccessControl: #other way is short form !Select [0, [AuthenticatedRead, BucketOwnerRead]]
+        Fn::Select: [2, [AuthenticatedRead, BucketOwnerRead, BucketOwnerFullControl]] #http://docs.aws.amazon.com/AmazonS3/latest/dev/acl-overview.html
+      BucketName: l3bucket.yogya.com
+      #CorsConfiguration: CORS Configuration
+      LifecycleConfiguration:
+        Rules:
+        - #ExpirationDate: String
+          ExpirationInDays: 121
+          Id: adsingh12345
+          #NoncurrentVersionExpirationInDays: Integer
+          #NoncurrentVersionTransition (deprecated):
+          #NoncurrentVersionTransition type
+          #NoncurrentVersionTransitions:
+          #  StorageClass: STANDARD_IA
+          #  #TransitionDate: String
+          #  TransitionInDays: 30
+          #Prefix: String
+          Status: Enabled
+          #Transition (deprecated):
+          #  Transition type
+          AbortIncompleteMultipartUpload:
+            DaysAfterInitiation: 7
+          Transitions:
+          - StorageClass: STANDARD_IA
+            #TransitionDate: String
+            TransitionInDays: 30
+          - StorageClass: GLACIER #StorageClass: REDUCED_REDUNDANCY can only be given only when put object
+            #TransitionDate: String
+            TransitionInDays: 60
+
+
+      #LoggingConfiguration:
+        #DestinationBucketName: default is current bucket
+      #  LogFilePrefix: logs/access/
+      #NotificationConfiguration: Notification Configuration
+      ReplicationConfiguration: #To enable replication, you must also enable versioning
+        Role: !GetAtt [L1S3ReplicationRole, Arn]
+        Rules:
+        - Destination:
+            Bucket: !Join ['', ['arn:aws:s3:::', !Ref ReplicationBucket]]
+            #StorageClass: String #not required
+          Id: s3-bucket-rep-rule
+          Prefix: ""
+          Status: Enabled
+
+      VersioningConfiguration:
+        Status:
+          Fn::Select: [0, [Enabled, Suspended]]
+      WebsiteConfiguration: #http://bucket-versioning-on.s3-website-us-west-2.amazonaws.com
+        ErrorDocument: error.html
+        IndexDocument: index.html
+        #RedirectAllRequestsTo:
+        #RoutingRules:
+        #- Routing rule

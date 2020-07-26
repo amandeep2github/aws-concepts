@@ -1,4 +1,4 @@
-package learn.aws.aws_concepts.s3;
+package learn.aws.s3;
 
 import static org.junit.Assert.*;
 

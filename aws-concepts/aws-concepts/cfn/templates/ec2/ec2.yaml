@@ -1,0 +1,35 @@
+Parameters: #Required: no
+  L0EC2InstanceTypeParam:
+    Type: String
+    Description: Type of instance e.g. micro, small etc
+    Default: t2.micro
+    AllowedValues:
+    - t2.nano
+    - t2.micro
+    - t2.small
+    ConstraintDescription: Can't be other than free instance type i.e. t2.micro
+  KeyName:
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  Ec2Az:
+    Type: String
+    Default: us-east-1a
+
+#Conditions: #Required: no
+
+Resources:
+  L0EC2:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref L0EC2InstanceTypeParam
+      #SecurityGroupIds: [!Ref L1SecurityGroup]
+      KeyName: !Ref KeyPairName
+      ImageId: ami-0b898040803850657
+      #SubnetId: !Ref L0Subnet
+      AvailabilityZone: !Ref Ec2Az
+      Tags:
+      - Key: Name
+        Value: L0EC2
+Outputs:
+  PublicDNSL0EC2:
+    Description: Public DNS Name of the EC2
+    Value: !GetAtt L0EC2.PublicIp
