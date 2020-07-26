@@ -1,0 +1,29 @@
+{
+  "AWSTemplateFormatVersion" : "2010-09-09",
+  "Resources" : {
+    "myStackWithParams" : {
+      "Type" : "AWS::CloudFormation::Stack",
+      "Properties" : {
+        "TemplateURL" : "https://s3.amazonaws.com/amandeep.singh22publicissapient.com/cfn/parameters.json",
+        "Parameters" : {
+          "InstanceType" : "t1.micro",
+          "KeyName" : "mykey"
+        }
+      }
+    },
+    "CWAD52QUD2": {
+      "Type": "AWS::CloudWatch::AnomalyDetector",
+      "Properties": {
+
+        "MetricName": {"Fn::GetAtt": ["myStackWithParams", "Outputs.RefVar"]},
+        "Namespace": "AWS/Lambda",
+        "Stat": "Sum"
+      }
+    }
+  },
+  "Outputs": {
+    "RefVar" : {
+      "Value": {"Fn::GetAtt": ["myStackWithParams", "Outputs.RefVar"]}
+    }
+  }
+}

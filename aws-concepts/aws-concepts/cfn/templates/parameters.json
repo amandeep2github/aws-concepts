@@ -1,0 +1,35 @@
+{
+  "Parameters": {
+    "InstanceType": {
+      "Type": "String",
+      "Default": "m1.small",
+      "Description": "EC2 instance type, e.g. m1.small, m1.large, etc."
+    },
+    "WebServerPort": {
+      "Type": "String",
+      "Default": "80",
+      "Description": "TCP/IP port of the web server"
+    },
+    "KeyName": {
+      "Type": "String",
+      "Default": "KeyNameValue",
+      "Description": "Name of an existing EC2 KeyPair to enable SSH access to the web server"
+    }
+  },
+  "Resources" : {
+    "CWAD52QUD1": {
+      "Type": "AWS::CloudWatch::AnomalyDetector",
+      "Properties": {
+
+        "MetricName": "Invocations",
+        "Namespace": "AWS/Lambda",
+        "Stat": "Sum"
+      }
+    }
+  },
+  "Outputs": {
+    "RefVar" : {
+      "Value": {"Ref": "KeyName"}
+    }
+  }
+}
