@@ -1,0 +1,46 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "instancei0d78ae1dc782d0a37": {
+        "Type": "AWS::EC2::Instance",
+        "Properties": {
+          "DisableApiTermination": "false",
+          "InstanceInitiatedShutdownBehavior": "stop",
+          "IamInstanceProfile": "Ec2SshRole",
+          "ImageId": "ami-0b898040803850657",
+          "InstanceType": "t2.micro",
+          "KeyName": "kp-us-east-1",
+          "Monitoring": "false",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "AmzLinux Box"
+            },
+            {
+              "Key": "account",
+              "Value": "p.s"
+            }
+          ],
+          "NetworkInterfaces": [
+            {
+              "DeleteOnTermination": "true",
+              "Description": "Primary network interface",
+              "DeviceIndex": 0,
+              "SubnetId": "subnet-7bc1dd74",
+              "PrivateIpAddresses": [
+                {
+                  "PrivateIpAddress": "172.31.72.236",
+                  "Primary": "true"
+                }
+              ],
+              "GroupSet": [
+                "sg-bd6f70e0",
+                "sg-0f3a935b2e45e726b"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "Description": "EC2"
+  }

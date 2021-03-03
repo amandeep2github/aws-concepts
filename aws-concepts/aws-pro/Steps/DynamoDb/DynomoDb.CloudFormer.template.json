@@ -1,0 +1,82 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "TableEverything": {
+        "Type": "AWS::DynamoDB::Table",
+        "Properties": {
+          "AttributeDefinitions": [
+            {
+              "AttributeName": "record_id",
+              "AttributeType": "N"
+            }
+          ],
+          "KeySchema": [
+            {
+              "AttributeName": "record_id",
+              "KeyType": "HASH"
+            }
+          ],
+          "ProvisionedThroughput": {
+            "ReadCapacityUnits": "1",
+            "WriteCapacityUnits": "1"
+          }, 
+          "TableName": "Everything",
+          "Tags" : [
+            {
+              "Key" : "Name", 
+              "Value" : "Everything"
+            }
+          ]
+        }
+      },
+      "alarmanythingReadCapacityUnitsLimitBasicAlarm": {
+        "Type": "AWS::CloudWatch::Alarm",
+        "Properties": {
+          "ActionsEnabled": "true",
+          "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+          "EvaluationPeriods": "5",
+          "MetricName": "ConsumedReadCapacityUnits",
+          "Namespace": "AWS/DynamoDB",
+          "Period": "60",
+          "Statistic": "Sum",          
+          "Threshold": "48.0",
+          "AlarmActions": [
+            "arn:aws:sns:us-east-1:844452815919:dynamodb"
+          ],
+          "Dimensions": [
+            {
+              "Name": "TableName",
+              "Value": {
+                "Ref" : "TableEverything"
+              }
+            }
+          ]
+        }
+      },
+      "alarmanythingWriteCapacityUnitsLimitBasicAlarm": {
+        "Type": "AWS::CloudWatch::Alarm",
+        "Properties": {
+          "ActionsEnabled": "true",
+          "ComparisonOperator": "GreaterThanOrEqualToThreshold",
+          "EvaluationPeriods": "5",
+          "MetricName": "ConsumedWriteCapacityUnits",
+          "Namespace": "AWS/DynamoDB",
+          "Period": "60",
+          "Statistic": "Sum",
+          "Threshold": "48.0",
+          "AlarmActions": [
+            "arn:aws:sns:us-east-1:844452815919:dynamodb"
+          ],
+          "Dimensions": [
+            {
+              "Name": "TableName",
+              "Value": {
+                "Ref" : "TableEverything"
+              }
+            }
+          ]
+        }
+      }
+    },
+    "Description": "Dynamo db table"
+  }

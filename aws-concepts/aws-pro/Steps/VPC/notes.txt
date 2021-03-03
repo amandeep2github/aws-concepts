@@ -1,0 +1,2 @@
+Can't have subnet of /30 masks as the first five are used by aws
+

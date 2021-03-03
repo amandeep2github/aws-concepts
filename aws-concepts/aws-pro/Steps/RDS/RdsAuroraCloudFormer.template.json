@@ -1,0 +1,109 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "rdsauroradatabase1instance1": {
+        "Type": "AWS::RDS::DBInstance",
+        "Properties": {
+          "AllocatedStorage": "0",
+          "AllowMajorVersionUpgrade": "false",
+          "AutoMinorVersionUpgrade": "true",
+          "DBInstanceClass": "db.t3.medium",
+          "Port": "5432",
+          "PubliclyAccessible": "true",
+          "StorageType": "aurora",
+          "BackupRetentionPeriod": "0",
+          "MasterUsername": "postgres",
+          "MasterUserPassword": "MyPassword",
+          "PreferredBackupWindow": "04:12-04:42",
+          "PreferredMaintenanceWindow": "sun:08:11-sun:08:41",
+          "DBName": "MyDatabase",
+          "Engine": "aurora-postgresql",
+          "EngineVersion": "11.6",
+          "LicenseModel": "postgresql-license",
+          "DBSubnetGroupName": {
+            "Ref": "dbsubnetdefaultvpc01593b9acb1339f6c"
+          },
+          "VPCSecurityGroups": [
+            {
+              "Ref": "sgMyPCPostgreSql"
+            }
+          ]
+        }
+      },
+      "rdsauroradatabase1instance1useast1b": {
+        "Type": "AWS::RDS::DBInstance",
+        "Properties": {
+          "AllocatedStorage": "0",
+          "AllowMajorVersionUpgrade": "false",
+          "AutoMinorVersionUpgrade": "true",
+          "DBInstanceClass": "db.t3.medium",
+          "Port": "5432",
+          "PubliclyAccessible": "true",
+          "StorageType": "aurora",
+          "BackupRetentionPeriod": "0",
+          "MasterUsername": "postgres",
+          "MasterUserPassword": "MyPassword",
+          "PreferredBackupWindow": "04:35-05:05",
+          "PreferredMaintenanceWindow": "sun:07:29-sun:07:59",
+          "DBName": "MyDatabase",
+          "Engine": "aurora-postgresql",
+          "EngineVersion": "11.6",
+          "LicenseModel": "postgresql-license",
+          "DBSubnetGroupName": {
+            "Ref": "dbsubnetdefaultvpc01593b9acb1339f6c"
+          },
+          "VPCSecurityGroups": [
+            {
+              "Ref": "sgMyPCPostgreSql"
+            }
+          ]
+        }
+      },
+      "dbsubnetdefaultvpc01593b9acb1339f6c": {
+        "Type": "AWS::RDS::DBSubnetGroup",
+        "Properties": {
+          "DBSubnetGroupDescription": "Created from the RDS Management Console",
+          "SubnetIds": [
+            "subnet-037edd875ec319060",
+            "subnet-01fff5523f476b476"
+          ]
+        }
+      },
+      "sgMyPCPostgreSql": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+          "GroupDescription": "Allows connection from my PC to postgreSql RDS",
+          "VpcId": "vpc-01593b9acb1339f6c",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "MyPCPostgreSql"
+            }
+          ]
+        }
+      },
+      "ingress2": {
+        "Type": "AWS::EC2::SecurityGroupIngress",
+        "Properties": {
+          "GroupId": {
+            "Ref": "sgMyPCPostgreSql"
+          },
+          "IpProtocol": "tcp",
+          "FromPort": "5432",
+          "ToPort": "5432",
+          "CidrIp": "59.144.18.118/32"
+        }
+      },
+      "egress3": {
+        "Type": "AWS::EC2::SecurityGroupEgress",
+        "Properties": {
+          "GroupId": {
+            "Ref": "sgMyPCPostgreSql"
+          },
+          "IpProtocol": "-1",
+          "CidrIp": "59.144.18.118/32"
+        }
+      }
+    },
+    "Description": "Aurora"
+  }

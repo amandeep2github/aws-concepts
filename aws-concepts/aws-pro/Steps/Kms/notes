@@ -1,0 +1,8 @@
+Name
+Sym/Asym
+permissions for principal
+permissions for services
+
+aws kms encrypt --key-id <mykey> --plaintext "mysecret"
+
+aws kms decrypt --ciphertext-blob AQICAHjQ7sViXQdeS4wWbFZpkOQWvCdNXqiy4Cnz0/xEBe39SQGz0vofeAo0+SyOXv172fqkAAAAZjBkBgkqhkiG9w0BBwagVzBVAgEAMFAGCSqGSIb3DQEHATAeBglghkgBZQMEAS4wEQQMhchHh0ugGzwRTC4gAgEQgCMlkhYlCYk2SfYIkfQ6ruwA71KBcN7ih/OPzSE86OT/eBOz3Q==

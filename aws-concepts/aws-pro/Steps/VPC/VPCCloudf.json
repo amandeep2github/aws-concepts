@@ -1,0 +1,52 @@
+{
+    "VPC1": {
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+            "CidrBlock": "10.10.0.0/16",
+            "InstanceTenancy": "default",
+            "EnableDnsSupport": "true",
+            "EnableDnsHostnames": "false",
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "My Dashboard"
+                }
+            ]
+        }
+    },
+    "subnet1": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+            "CidrBlock": "172.31.48.0/20",
+            "AvailabilityZone": "us-east-2a",
+            "VpcId": {
+                "Ref": "VPC1"
+            }
+        }
+    },
+    "subnet2": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+            "CidrBlock": "172.31.0.0/20",
+            "AvailabilityZone": "us-east-2b",
+            "VpcId": {
+                "Ref": "VPC1"
+            },
+            "Tags": [
+                {
+                    "Key": "Name",
+                    "Value": "MyDashboard"
+                }
+            ]
+        }
+    },
+    "subnet3": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+            "CidrBlock": "172.31.32.0/20",
+            "AvailabilityZone": "us-east-2a",
+            "VpcId": {
+                "Ref": "VPC1"
+            }
+        }
+    }

@@ -1,0 +1,254 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "vpc01593b9acb1339f6c": {
+        "Type": "AWS::EC2::VPC",
+        "Properties": {
+          "CidrBlock": "192.0.0.0/24",
+          "InstanceTenancy": "default",
+          "EnableDnsSupport": "true",
+          "EnableDnsHostnames": "true",
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "SmallVpc"
+            }
+          ]
+        }
+      },
+      "subnet01fff5523f476b476": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "CidrBlock": "192.0.0.16/28",
+          "AvailabilityZone": "us-east-1b",
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "SmallSubn2"
+            }
+          ]
+        }
+      },
+      "subnet037edd875ec319060": {
+        "Type": "AWS::EC2::Subnet",
+        "Properties": {
+          "CidrBlock": "192.0.0.0/28",
+          "AvailabilityZone": "us-east-1a",
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "SmallSubn1"
+            }
+          ]
+        }
+      },
+      "igwf7e1448c": {
+        "Type": "AWS::EC2::InternetGateway",
+        "Properties": {
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "SharedInternetgw"
+            }
+          ]
+        }
+      },
+      "doptaf4c5fd4": {
+        "Type": "AWS::EC2::DHCPOptions",
+        "Properties": {
+          "DomainName": "ec2.internal",
+          "DomainNameServers": [
+            "AmazonProvidedDNS"
+          ]
+        }
+      },
+      "acl0365dea63fd37174d": {
+        "Type": "AWS::EC2::NetworkAcl",
+        "Properties": {
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          }
+        }
+      },
+      "rtb093ccf9b7d3a1f69e": {
+        "Type": "AWS::EC2::RouteTable",
+        "Properties": {
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "SmallVPCRTbl"
+            }
+          ]
+        }
+      },
+      "rdspostgresdb": {
+        "Type": "AWS::RDS::DBInstance",
+        "Properties": {
+          "AllocatedStorage": "20",
+          "AllowMajorVersionUpgrade": "false",
+          "AutoMinorVersionUpgrade": "true",
+          "DBInstanceClass": "db.t2.micro",
+          "Port": "5432",
+          "StorageType": "gp2",
+          "BackupRetentionPeriod": "7",
+          "MasterUsername": "postgres",
+          "MasterUserPassword": "MyPassword",
+          "PreferredBackupWindow": "05:27-05:57",
+          "PreferredMaintenanceWindow": "mon:03:15-mon:03:45",
+          "DBName": "MyDatabase",
+          "Engine": "postgres",
+          "EngineVersion": "11.6",
+          "LicenseModel": "postgresql-license",
+          "DBSubnetGroupName": {
+            "Ref": "dbsubnetdefaultvpc01593b9acb1339f6c"
+          },
+          "VPCSecurityGroups": [
+            "sg-00ede22d77eba136b"
+          ]
+        }
+      },
+      "dbsubnetdefaultvpc01593b9acb1339f6c": {
+        "Type": "AWS::RDS::DBSubnetGroup",
+        "Properties": {
+          "DBSubnetGroupDescription": "Created from the RDS Management Console",
+          "SubnetIds": [
+            {
+              "Ref": "subnet037edd875ec319060"
+            },
+            {
+              "Ref": "subnet01fff5523f476b476"
+            }
+          ]
+        }
+      },
+      "sgMyPCPostgreSql": {
+        "Type": "AWS::EC2::SecurityGroup",
+        "Properties": {
+          "GroupDescription": "Allows connection from my PC to postgreSql RDS",
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "Tags": [
+            {
+              "Key": "Name",
+              "Value": "MyPCPostgreSql"
+            }
+          ]
+        }
+      },
+      "acl1": {
+        "Type": "AWS::EC2::NetworkAclEntry",
+        "Properties": {
+          "CidrBlock": "0.0.0.0/0",
+          "Egress": "true",
+          "Protocol": "-1",
+          "RuleAction": "allow",
+          "RuleNumber": "100",
+          "NetworkAclId": {
+            "Ref": "acl0365dea63fd37174d"
+          }
+        }
+      },
+      "acl2": {
+        "Type": "AWS::EC2::NetworkAclEntry",
+        "Properties": {
+          "CidrBlock": "0.0.0.0/0",
+          "Protocol": "-1",
+          "RuleAction": "allow",
+          "RuleNumber": "100",
+          "NetworkAclId": {
+            "Ref": "acl0365dea63fd37174d"
+          }
+        }
+      },
+      "subnetacl1": {
+        "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+        "Properties": {
+          "NetworkAclId": {
+            "Ref": "acl0365dea63fd37174d"
+          },
+          "SubnetId": {
+            "Ref": "subnet01fff5523f476b476"
+          }
+        }
+      },
+      "subnetacl2": {
+        "Type": "AWS::EC2::SubnetNetworkAclAssociation",
+        "Properties": {
+          "NetworkAclId": {
+            "Ref": "acl0365dea63fd37174d"
+          },
+          "SubnetId": {
+            "Ref": "subnet037edd875ec319060"
+          }
+        }
+      },
+      "gw1": {
+        "Type": "AWS::EC2::VPCGatewayAttachment",
+        "Properties": {
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "InternetGatewayId": {
+            "Ref": "igwf7e1448c"
+          }
+        }
+      },
+      "route1": {
+        "Type": "AWS::EC2::Route",
+        "Properties": {
+          "DestinationCidrBlock": "0.0.0.0/0",
+          "RouteTableId": {
+            "Ref": "rtb093ccf9b7d3a1f69e"
+          },
+          "GatewayId": {
+            "Ref": "igwf7e1448c"
+          }
+        },
+        "DependsOn": "gw1"
+      },
+      "dchpassoc1": {
+        "Type": "AWS::EC2::VPCDHCPOptionsAssociation",
+        "Properties": {
+          "VpcId": {
+            "Ref": "vpc01593b9acb1339f6c"
+          },
+          "DhcpOptionsId": {
+            "Ref": "doptaf4c5fd4"
+          }
+        }
+      },
+      "ingress1": {
+        "Type": "AWS::EC2::SecurityGroupIngress",
+        "Properties": {
+          "GroupId": {
+            "Ref": "sgMyPCPostgreSql"
+          },
+          "IpProtocol": "tcp",
+          "FromPort": "5432",
+          "ToPort": "5432",
+          "CidrIp": "59.144.18.118/32"
+        }
+      },
+      "egress1": {
+        "Type": "AWS::EC2::SecurityGroupEgress",
+        "Properties": {
+          "GroupId": {
+            "Ref": "sgMyPCPostgreSql"
+          },
+          "IpProtocol": "-1",
+          "CidrIp": "59.144.18.118/32"
+        }
+      }
+    },
+    "Description": "template for rds"
+  }

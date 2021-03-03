@@ -1,0 +1,30 @@
+ 58  aws cloudformation validate-template --template-body file://RdsPostgreSqlCloudFTemplate.json
+   59  aws cloudformation validate-template --template-body file://RdsPostgreSqlCloudFTemplate.json
+   60  aws s3 cp RdsPostgreSqlCloudFTemplate.json s3://amandeep.singh22publicissapient.com/cfn/RdsPostgreSqlCloudFTemplate.json
+   61  aws cloudformation validate-template --template-body file://RdsPostgreSqlCloudFTemplate.json
+   62  aws s3 cp RdsPostgreSqlCloudFTemplate.json s3://amandeep.singh22publicissapient.com/cfn/RdsPostgreSqlCloudFTemplate.json
+   73  aws cloudformation delete-stack --stack-name RDS
+   74  aws cloudformation create-stack --template-body file://RdsPostgreSqlCloudFTemplate.json --stack-name RDS
+   75  aws cloudformation delete-stack --stack-name RDS
+
+
+
+   Problems:
+   in security group how to give All in ports
+
+   for Aurora don't give database name while connecting your Sql Editor.
+   can i connect to cluster? and if yes then can i do read and write
+
+
+
+
+    "ImportedSecurityGroupBackup" : {
+            "Type" : "AWS::EC2::SecurityGroup",
+            "Condition" : "CreateBackupResource",
+            "DeletionPolicy" : "Retain"
+
+        }
+
+"Conditions" : {
+        "CreateBackupResource" : {"Fn::Equals" : ["1", "2"]}
+    },        

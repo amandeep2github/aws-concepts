@@ -1,0 +1,6 @@
+ aws cloudformation create-stack --template-body file://CloudFormation.template --stack-name CloudFormer --parameters ParameterKey=Username,ParameterValue=amandeep ParameterKey=Password,ParameterValue=password --capabilities CAPABILITY_IAM
+{
+    "StackId": "arn:aws:cloudformation:us-east-1:844452815919:stack/CloudFormer/500701a0-df22-11ea-a78c-12878b97cc21"
+}
+
+You have to change security group to allow https from your laptop

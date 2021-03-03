@@ -1,0 +1,60 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Resources": {
+      "topicEc2LowUsageTopic": {
+        "Type": "AWS::SNS::Topic",
+        "Properties": {
+          "DisplayName": "Ec2LowUsageTopic",
+          "Subscription": [
+            {
+              "Endpoint": "amandeep.singh2@publicissapient.com",
+              "Protocol": "email"
+            }
+          ]
+        }
+      },
+      "snspolicyEc2LowUsageTopic": {
+        "Type": "AWS::SNS::TopicPolicy",
+        "Properties": {
+          "Topics": [
+            {
+              "Ref": "topicEc2LowUsageTopic"
+            }
+          ],
+          "PolicyDocument": {
+            "Version": "2008-10-17",
+            "Id": "__default_policy_ID",
+            "Statement": [
+              {
+                "Sid": "__default_statement_ID",
+                "Effect": "Allow",
+                "Principal": {
+                  "AWS": "*"
+                },
+                "Action": [
+                  "SNS:GetTopicAttributes",
+                  "SNS:SetTopicAttributes",
+                  "SNS:AddPermission",
+                  "SNS:RemovePermission",
+                  "SNS:DeleteTopic",
+                  "SNS:Subscribe",
+                  "SNS:ListSubscriptionsByTopic",
+                  "SNS:Publish",
+                  "SNS:Receive"
+                ],
+                "Resource": {
+                  "Ref": "topicEc2LowUsageTopic"
+                },
+                "Condition": {
+                  "StringEquals": {
+                    "AWS:SourceOwner": "844452815919"
+                  }
+                }
+              }
+            ]
+          }
+        }
+      }
+    },
+    "Description": "Sns"
+  }

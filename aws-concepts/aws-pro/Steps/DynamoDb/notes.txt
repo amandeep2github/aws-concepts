@@ -1,0 +1,11 @@
+dynamo db doesn't support auto increment keys. as its expected to scale many partitions/shards/servers its considered
+anti pattern.
+
+one advice is to use UUID
+
+update template to include local secondary index and global secondary index
+create a backup
+create join partition keys
+global secondary index uses another storage so comes with its own read/write capacity units
+
+Backup and TTL

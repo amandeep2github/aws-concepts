@@ -1,0 +1,9 @@
+choose FSx
+Capacity (32 GB min)
+Single az?
+Active Directory
+(name, dns name, )
+mount on windows (can mount on linux as well if)
+go to backup
+
+For Luster min is 1200 GB
